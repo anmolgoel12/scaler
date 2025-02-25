@@ -1,0 +1,8 @@
+# site.yml
+---
+- name: Apply Server Configurations
+  hosts: localhost
+  become: yes
+  roles:
+    - configure_server
+

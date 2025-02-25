@@ -1,0 +1,23 @@
+# tasks/main.yml
+---
+- name: Load server configuration variables
+  include_vars:
+    file: "{{ role_path }}/vars/server_config.yml"
+    name: server_config
+- name: Print all loaded variables
+  debug:
+    var: server_config
+- name: Print admin user
+  debug:
+    msg: "Admin user is: {{ role_path }}"
+
+- name: Print encrypted admin password (for debugging)
+  debug:
+    msg: "Encrypted password is: {{ server_config.admin_password }}"
+
+- name: Create admin user (for demonstration)
+  user:
+    name: "{{ server_config.admin_user }}"
+    password: "{{ server_config.admin_password | password_hash('sha512') }}"
+    state: present
+
