@@ -1,0 +1,28 @@
+---
+- name: Manage environment secrets dynamically
+  hosts: localhost
+  gather_facts: no
+  vars_prompt:
+    - name: "env"
+      prompt: "Which environment would you like to configure? (dev/prod)"
+      private: no
+
+  tasks:
+    - name: Set the vault file path based on environment
+      debug:
+        msg: "The db_password for {{ env }}"
+    - name: Set the vault file path based on environment
+      set_fact:
+        vault_file: "{{ 'dev_secrets.yml' if  env  == 'dev' else 'prod_secrets.yml' }}"
+
+    - name: Load the appropriate secrets file
+      include_vars:
+        file: "{{ vault_file }}"
+        name: vault
+      vars:
+        ansible_vault_password_file: "{{ vault_file | regex_replace('secrets.yml', 'vault_password.txt') }}"
+
+    - name: Show the db_password
+      debug:
+        msg: "{{ vault_file | regex_replace('secrets.yml', 'vault_password.txt') }} {{ vault.db_password }}"
+
