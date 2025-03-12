@@ -1,0 +1,46 @@
+sudo apt-get update && sudo apt-get upgrade -y
+sudo apt-get install -y nginx apache2 apache2-utils fail2ban vim ufw
+
+#task2
+check_user_exists() {
+  if id "$1" &>/dev/null; then
+    echo "User '$1' exists."
+    return 0
+  else
+    echo "User '$1' does not exist."
+    return 1
+  fi
+}
+
+# Function to create a user with a disabled password
+create_user_with_disabled_password() {
+ sudo  useradd -m -s /bin/bash "$1"  # Create user and set default shell
+  sudo passwd -l "$1"                # Lock the user's password
+  echo "User '$1' created with a disabled password."
+}
+
+# Check if the user 'johndoe' exists and create if not
+if ! check_user_exists "johndoe"; then
+  create_user_with_disabled_password "johndoe"
+fi
+
+# Check if the user 'janedoe' exists and create if not
+if ! check_user_exists "janedoe"; then
+  create_user_with_disabled_password "janedoe"
+fi
+
+#task3 
+sudo systemctl disable apache2
+
+# Function to disable root login in SSH
+disable_root_login() {
+  if sudo  grep -q "^PermitRootLogin" /etc/ssh/sshd_config; then
+    # Modify the existing line
+    sudo sed -i 's/^PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
+  else
+    # Add the line at the end of the file if it doesn't exist
+    echo "PermitRootLogin no" | sudo tee -a  /etc/ssh/sshd_config
+  fi
+  echo "Root login disabled in SSH."
+}
+disable_root_login
